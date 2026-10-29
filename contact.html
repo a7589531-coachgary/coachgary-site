@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>聯絡與合作｜CoachGary Performance</title>
+<meta name="description" content="聯絡 CoachGary Performance：線上運動表現支持計畫報名、肌力及體能訓練諮詢、球隊與學校合作洽詢。">
+<meta property="og:title" content="聯絡與合作｜CoachGary Performance">
+<meta property="og:site_name" content="CoachGary Performance">
+<meta property="og:image" content="https://wondrous-conkies-68042c.netlify.app/assets/og.jpg">
+<meta property="og:url" content="https://wondrous-conkies-68042c.netlify.app/contact.html">
+<link rel="canonical" href="https://wondrous-conkies-68042c.netlify.app/contact.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/logo-112.png">
+<link rel="apple-touch-icon" href="assets/logo-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="contact">
+<a class="skip" href="#main">跳至主要內容</a>
+<header class="nav" id="site-header"></header>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">首頁</a> / 聯絡與合作</div>
+      <h1>聯絡與合作</h1>
+      <p class="lead">不確定哪個方案適合你？填寫表單，我會親自回覆。</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap contact-layout">
+      <!-- Netlify Forms：部署到 Netlify 後自動啟用，提交內容會出現在 Netlify 後台 Forms -->
+      <form class="card contact-form" name="contact" method="POST" action="thanks.html" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="contact">
+        <p class="hp"><label>請勿填寫：<input name="bot-field"></label></p>
+        <h2>諮詢表單</h2>
+        <div class="field-row">
+          <label class="field"><span>姓名 <i>*</i></span><input name="name" required autocomplete="name"></label>
+          <label class="field"><span>Email <i>*</i></span><input type="email" name="email" required autocomplete="email"></label>
+        </div>
+        <div class="field-row">
+          <label class="field"><span>身分 <i>*</i></span>
+            <select name="role" required>
+              <option value="">請選擇</option>
+              <option>運動員</option>
+              <option>家長</option>
+              <option>教練</option>
+              <option>球隊／學校</option>
+              <option>其他</option>
+            </select>
+          </label>
+          <label class="field"><span>諮詢項目 <i>*</i></span>
+            <select name="topic" required>
+              <option value="">請選擇</option>
+              <option>線上運動表現支持計畫</option>
+              <option>肌力與體能訓練諮詢</option>
+              <option>實體訓練</option>
+              <option>球隊合作／講座邀約</option>
+              <option>其他</option>
+            </select>
+          </label>
+        </div>
+        <label class="field"><span>運動項目與位置</span><input name="sport" placeholder="例如：棒球・投手・高二"></label>
+        <label class="field"><span>想諮詢的內容 <i>*</i></span><textarea name="message" rows="5" required placeholder="目前訓練狀況、目標，或合作需求"></textarea></label>
+        <button class="btn accent" type="submit">送出諮詢</button>
+        <p class="note">送出後我會以 Email 回覆，通常 1–3 個工作天內。</p>
+      </form>
+
+      <aside class="contact-side">
+        <div class="card">
+          <h3>線上運動表現支持計畫</h3>
+          <p style="margin-bottom:16px">已確定要報名？直接填寫完整報名表。</p>
+          <a class="link-arrow" data-form="program" href="#">填寫報名表 →</a>
+        </div>
+        <div class="card">
+          <h3>Instagram 私訊</h3>
+          <p style="margin-bottom:16px">簡單的問題，也可以直接私訊我。</p>
+          <a class="link-arrow" href="https://www.instagram.com/coach_gary_" target="_blank" rel="noopener">@coach_gary_ →</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site" id="site-footer"></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

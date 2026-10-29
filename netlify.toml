@@ -1,0 +1,7 @@
+# Netlify 建置設定：每次 GitHub 有更新（包含在後台發文），Netlify 會自動執行建置
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

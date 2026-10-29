@@ -1,0 +1,42 @@
+# Decap CMS 文章後台設定
+backend:
+  name: github
+  repo: a7589531-coachgary/coachgary-site
+  branch: main
+  commit_messages:
+    create: "新增文章：{{slug}}"
+    update: "更新文章：{{slug}}"
+    delete: "刪除文章：{{slug}}"
+    uploadMedia: "上傳圖片：{{path}}"
+    deleteMedia: "刪除圖片：{{path}}"
+
+locale: zh_Hant
+site_url: https://wondrous-conkies-68042c.netlify.app
+display_url: https://wondrous-conkies-68042c.netlify.app
+logo_url: /assets/logo-180.png
+
+# 上傳的圖片存放位置
+media_folder: assets/uploads
+public_folder: /assets/uploads
+
+collections:
+  - name: posts
+    label: 文章
+    label_singular: 文章
+    folder: content/posts
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    summary: "{{title}}（{{category}}）"
+    sortable_fields: ["date", "title"]
+    fields:
+      - { label: 標題, name: title, widget: string }
+      - { label: 發布日期, name: date, widget: datetime, format: "YYYY-MM-DDTHH:mm:ssZ" }
+      - label: 分類
+        name: category
+        widget: select
+        options: ["肌力訓練", "傷害預防", "速度訓練", "運動科學", "訓練觀念", "其他"]
+        default: "訓練觀念"
+      - { label: 摘要（顯示在文章列表與分享預覽，約 50 字）, name: summary, widget: text, required: false }
+      - { label: 封面圖（建議橫式 1200×630）, name: cover, widget: image, required: false }
+      - { label: 草稿（勾選後不會出現在網站上）, name: draft, widget: boolean, default: false }
+      - { label: 內文, name: body, widget: markdown }
