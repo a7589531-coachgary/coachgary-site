@@ -6,6 +6,7 @@
     "build": "node build.js"
   },
   "dependencies": {
+    "@netlify/blobs": "11.1.7",
     "gray-matter": "4.0.3",
     "marked": "18.1.2"
   }

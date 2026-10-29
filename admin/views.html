@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>文章觀看次數｜CoachGary Performance</title>
+<link rel="icon" type="image/png" href="/assets/logo-112.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+<style>
+  body { background: var(--bg-soft); }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 0; }
+  .top a.brand img { width: 36px; height: 36px; }
+  .top .btn { white-space: nowrap; }
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 8px 0 24px; }
+  .summary .card { padding: 20px 22px; }
+  .summary small { color: var(--ink-3); font-size: 13px; }
+  .summary b { display: block; font-family: "Inter", sans-serif; font-size: 30px; color: var(--navy); }
+  .summary .top-title { font-size: 15px; font-family: inherit; line-height: 1.5; margin-top: 6px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--line); font-size: 15px; }
+  th { background: #fff; font-size: 13px; color: var(--ink-3); cursor: pointer; user-select: none; white-space: nowrap; }
+  th[aria-sort] { color: var(--navy); }
+  td.num, th.num { text-align: right; font-family: "Inter", sans-serif; }
+  td.num b { font-size: 17px; color: var(--navy); }
+  tr:last-child td { border-bottom: 0; }
+  td a { text-decoration: none; font-weight: 700; }
+  td a:hover { color: var(--accent-ink); }
+  .bar { height: 6px; border-radius: 3px; background: var(--accent); margin-top: 6px; min-width: 2px; }
+  .muted { color: var(--ink-3); font-size: 13px; }
+  .msg { padding: 40px; text-align: center; color: var(--ink-3); background: #fff; border: 1px solid var(--line); border-radius: var(--radius); }
+  @media (max-width: 640px) {
+    .top .brand b { display: none; }
+    .summary { grid-template-columns: 1fr 1fr; }
+    .summary .card:last-child { grid-column: 1 / -1; }
+    th.hide-sm, td.hide-sm { display: none; }
+    th, td { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="/admin/"><img src="/assets/logo-112.png" alt=""><b>CoachGary <span>Performance</span></b></a>
+    <a class="btn" href="/admin/">← 回到文章後台</a>
+  </div>
+
+  <h1 style="font-size:30px;margin:8px 0 4px">文章觀看次數</h1>
+  <p class="muted" style="margin:0 0 20px">同一位讀者在同一次瀏覽中重複打開只計 1 次。數字從開始統計的那天起累計。</p>
+
+  <div class="summary">
+    <div class="card"><small>總觀看次數</small><b id="total">–</b></div>
+    <div class="card"><small>已發布文章</small><b id="count">–</b></div>
+    <div class="card"><small>最多人看</small><b class="top-title" id="best">–</b></div>
+  </div>
+
+  <div id="table"><div class="msg">讀取中…</div></div>
+  <p class="muted" style="margin:16px 0 48px">點表頭可以切換排序。<button class="btn" type="button" id="reload" style="padding:6px 14px;font-size:13px;margin-left:8px">重新整理</button></p>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  let rows = [], sort = { key: "views", dir: -1 };
+
+  const COLS = [
+    { key: "title", label: "文章" },
+    { key: "category", label: "分類", cls: "hide-sm" },
+    { key: "date", label: "發布日期", cls: "hide-sm" },
+    { key: "views", label: "觀看次數", cls: "num" }
+  ];
+
+  function render() {
+    if (!rows.length) { $("table").innerHTML = '<div class="msg">目前還沒有已發布的文章。</div>'; return; }
+    const max = Math.max(1, ...rows.map(r => r.views));
+    const sorted = [...rows].sort((a, b) => (a[sort.key] > b[sort.key] ? 1 : a[sort.key] < b[sort.key] ? -1 : 0) * sort.dir);
+    $("table").innerHTML = `<table>
+      <thead><tr>${COLS.map(c => `<th class="${c.cls || ""}" data-key="${c.key}"${c.key === sort.key ? ` aria-sort="${sort.dir > 0 ? "ascending" : "descending"}"` : ""}>${c.label}${c.key === sort.key ? (sort.dir > 0 ? " ↑" : " ↓") : ""}</th>`).join("")}</tr></thead>
+      <tbody>${sorted.map(r => `<tr>
+        <td><a href="/${r.url}" target="_blank" rel="noopener">${esc(r.title)}</a></td>
+        <td class="hide-sm">${esc(r.category)}</td>
+        <td class="hide-sm">${esc(r.date)}</td>
+        <td class="num"><b>${r.views.toLocaleString()}</b><div class="bar" style="width:${Math.round(r.views / max * 100)}%;margin-left:auto"></div></td>
+      </tr>`).join("")}</tbody></table>`;
+    document.querySelectorAll("th").forEach(th => th.addEventListener("click", () => {
+      const key = th.dataset.key;
+      sort = { key, dir: sort.key === key ? -sort.dir : (key === "title" || key === "category" ? 1 : -1) };
+      render();
+    }));
+  }
+
+  async function load() {
+    $("table").innerHTML = '<div class="msg">讀取中…</div>';
+    try {
+      const [posts, views] = await Promise.all([
+        fetch("/assets/posts.json", { cache: "no-store" }).then(r => r.json()),
+        fetch("/api/views", { cache: "no-store" }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      ]);
+      rows = posts.map(p => ({ ...p, views: views[p.slug] || 0 }));
+      const total = rows.reduce((s, r) => s + r.views, 0);
+      const best = [...rows].sort((a, b) => b.views - a.views)[0];
+      $("total").textContent = total.toLocaleString();
+      $("count").textContent = rows.length;
+      $("best").textContent = best && best.views ? `${best.title}（${best.views}）` : "–";
+      render();
+    } catch (e) {
+      $("table").innerHTML = '<div class="msg">暫時讀不到觀看次數，請稍後再試。<br><small>（若網站剛更新，請等 1–2 分鐘）</small></div>';
+    }
+  }
+
+  $("reload").addEventListener("click", load);
+  load();
+</script>
+</body>
+</html>

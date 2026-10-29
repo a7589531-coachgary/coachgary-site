@@ -5,3 +5,7 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# 觀看次數 API 的程式放在 netlify/functions
+[functions]
+  directory = "netlify/functions"

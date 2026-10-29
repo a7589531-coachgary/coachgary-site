@@ -11,7 +11,7 @@ const POSTS_DIR = path.join(ROOT, "content", "posts");
 const SITE_URL = (process.env.URL || "https://jocular-tulumba-f558a8.netlify.app").replace(/\/$/, "");
 
 // 不需要發佈的檔案
-const SKIP = new Set(["dist", "node_modules", "content", "build.js", "package.json", "package-lock.json", "netlify.toml", "README.md", ".git", ".gitignore"]);
+const SKIP = new Set(["dist", "node_modules", "content", "netlify", "build.js", "package.json", "package-lock.json", "netlify.toml", "README.md", ".git", ".gitignore"]);
 
 // 分類與卡片底色：在後台「網站設定 → 文章分類」管理
 const DEFAULT_COLOR = "#eef1f4";
@@ -190,7 +190,7 @@ ${JSON.stringify({
 }, null, 2)}
 </script>
 </head>
-<body data-page="blog">
+<body data-page="blog" data-slug="${esc(p.slug)}">
 <a class="skip" href="#main">跳至主要內容</a>
 <header class="nav" id="site-header"></header>
 
@@ -270,5 +270,9 @@ if (posts.length) {
   inject("index.html", "LATEST", `\n      <div class="grid-3">${posts.slice(0, 3).map(p => card(p)).join("")}\n      </div>`);
 }
 fs.writeFileSync(path.join(DIST, "sitemap.xml"), sitemap(posts));
+// 後台「觀看次數」頁使用的文章清單
+fs.writeFileSync(path.join(DIST, "assets", "posts.json"), JSON.stringify(
+  posts.map(p => ({ slug: p.slug, title: p.title, date: formatDate(p.date), category: p.category, url: p.url }))
+));
 
 console.log(`建置完成：${posts.length} 篇文章，網址 ${SITE_URL}`);
