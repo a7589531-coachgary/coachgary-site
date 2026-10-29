@@ -10,6 +10,9 @@ backend:
     uploadMedia: "上傳圖片：{{path}}"
     deleteMedia: "刪除圖片：{{path}}"
 
+# 編輯流程模式：編輯頁有「儲存」按鈕，未完成的文章放在「工作流程」看板，按「發布」才會上線
+publish_mode: editorial_workflow
+
 locale: zh_Hant
 site_url: https://jocular-tulumba-f558a8.netlify.app
 display_url: https://jocular-tulumba-f558a8.netlify.app
@@ -26,7 +29,7 @@ collections:
     folder: content/posts
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    summary: "{{title}}（{{category}}）"
+    summary: "{{draft | ternary('【已下架】', '【已完成】')}} {{title}}（{{category}}）"
     sortable_fields: ["date", "title"]
     fields:
       - { label: 標題, name: title, widget: string }
@@ -43,7 +46,7 @@ collections:
         options_length: 50
       - { label: 摘要（顯示在文章列表與分享預覽，約 50 字）, name: summary, widget: text, required: false }
       - { label: 封面圖（建議橫式 1200×630）, name: cover, widget: image, required: false }
-      - { label: 草稿（勾選後不會出現在網站上）, name: draft, widget: boolean, default: false }
+      - { label: 從網站下架（已發布的文章想暫時隱藏時勾選）, name: draft, widget: boolean, default: false, required: false }
       - { label: 內文, name: body, widget: markdown }
 
   - name: settings
