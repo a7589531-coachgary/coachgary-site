@@ -31,12 +31,46 @@ collections:
     fields:
       - { label: 標題, name: title, widget: string }
       - { label: 發布日期, name: date, widget: datetime, format: "YYYY-MM-DDTHH:mm:ssZ" }
-      - label: 分類
+      # 分類選項來自「網站設定 → 文章分類」，可在後台自行新增
+      - label: 分類（要新增分類，請到左側「網站設定 → 文章分類」）
         name: category
-        widget: select
-        options: ["肌力訓練", "傷害預防", "速度訓練", "運動科學", "訓練觀念", "其他"]
-        default: "訓練觀念"
+        widget: relation
+        collection: settings
+        file: categories
+        search_fields: ["categories.*.name"]
+        value_field: "categories.*.name"
+        display_fields: ["categories.*.name"]
+        options_length: 50
       - { label: 摘要（顯示在文章列表與分享預覽，約 50 字）, name: summary, widget: text, required: false }
       - { label: 封面圖（建議橫式 1200×630）, name: cover, widget: image, required: false }
       - { label: 草稿（勾選後不會出現在網站上）, name: draft, widget: boolean, default: false }
       - { label: 內文, name: body, widget: markdown }
+
+  - name: settings
+    label: 網站設定
+    editor: { preview: false }
+    files:
+      - name: categories
+        label: 文章分類
+        file: content/settings/categories.json
+        fields:
+          - label: 分類清單（可新增、改名、拖曳排序）
+            name: categories
+            widget: list
+            label_singular: 分類
+            summary: "{{fields.name}}"
+            fields:
+              - { label: 分類名稱, name: name, widget: string }
+              - label: 文章卡片底色
+                name: color
+                widget: select
+                default: "#eef1f4"
+                options:
+                  - { label: 淺藍, value: "#e6f6fb" }
+                  - { label: 藍紫, value: "#e8eefc" }
+                  - { label: 淺綠, value: "#eaf5ee" }
+                  - { label: 淺紫, value: "#f3ecfb" }
+                  - { label: 淺橘, value: "#fdf0e6" }
+                  - { label: 淺紅, value: "#fdeaec" }
+                  - { label: 淺黃, value: "#fdf6dc" }
+                  - { label: 淺灰, value: "#eef1f4" }

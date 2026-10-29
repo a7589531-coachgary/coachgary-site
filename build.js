@@ -13,14 +13,15 @@ const SITE_URL = (process.env.URL || "https://jocular-tulumba-f558a8.netlify.app
 // 不需要發佈的檔案
 const SKIP = new Set(["dist", "node_modules", "content", "build.js", "package.json", "package-lock.json", "netlify.toml", "README.md", ".git", ".gitignore"]);
 
-const CATEGORY_COLORS = {
-  "肌力訓練": "var(--accent-soft)",
-  "傷害預防": "#e8eefc",
-  "速度訓練": "#eaf5ee",
-  "運動科學": "#f3ecfb",
-  "訓練觀念": "#fdf0e6",
-  "其他": "#eef1f4"
-};
+// 分類與卡片底色：在後台「網站設定 → 文章分類」管理
+const DEFAULT_COLOR = "#eef1f4";
+function loadCategoryColors() {
+  const f = path.join(ROOT, "content", "settings", "categories.json");
+  if (!fs.existsSync(f)) return {};
+  const list = JSON.parse(fs.readFileSync(f, "utf8")).categories || [];
+  return Object.fromEntries(list.filter(c => c && c.name).map(c => [c.name, c.color || DEFAULT_COLOR]));
+}
+const CATEGORY_COLORS = loadCategoryColors();
 
 const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -68,7 +69,7 @@ function loadPosts() {
 function card(p) {
   const thumb = p.cover
     ? `<img class="thumb" src="${esc(p.cover)}" alt="" loading="lazy">`
-    : `<div class="thumb" style="background:${CATEGORY_COLORS[p.category] || CATEGORY_COLORS["其他"]}">${esc(p.category)}</div>`;
+    : `<div class="thumb" style="background:${CATEGORY_COLORS[p.category] || DEFAULT_COLOR}">${esc(p.category)}</div>`;
   return `
         <a class="card post" href="${p.url}">
           ${thumb}
