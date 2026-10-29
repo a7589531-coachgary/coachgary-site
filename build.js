@@ -65,28 +65,52 @@ function loadPosts() {
         summary: data.summary || "",
         cover: data.cover || "",
         draft: data.draft === true,
-        html: marked.parse(content)
+        html: marked.parse(content),
+        // 閱讀時間：中文約每分鐘 400 字
+        readMin: Math.max(1, Math.round(content.replace(/!\[.*?\]\(.*?\)|[#>*_`\-\[\]()]|\s/g, "").length / 400))
       };
     })
     .filter(p => !p.draft)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
-function card(p) {
-  const thumb = p.cover
-    ? `<img class="thumb" src="${esc(p.cover)}" alt="" loading="lazy">`
-    : `<div class="thumb" style="background:${CATEGORY_COLORS[p.category] || DEFAULT_COLOR}">${esc(p.category)}</div>`;
+const colorOf = c => CATEGORY_COLORS[c] || DEFAULT_COLOR;
+const searchText = p => esc(`${p.title} ${p.summary} ${p.category}`.toLowerCase());
+const media = p => p.cover
+  ? `<img class="thumb" src="${esc(p.cover)}" alt="" loading="lazy">`
+  : `<div class="thumb thumb-text" style="background:${colorOf(p.category)}">${esc(p.category)}</div>`;
+const pill = p => `<span class="cat-pill" style="--c:${colorOf(p.category)}">${esc(p.category)}</span>`;
+const foot = p => `<div class="post-foot"><span>${formatDate(p.date)}</span><span>約 ${p.readMin} 分鐘閱讀</span></div>`;
+
+function card(p, latest = false) {
   return `
-        <a class="card post" href="${p.url}" data-category="${esc(p.category)}">
-          ${thumb}
-          <div class="meta">${esc(p.category)}・${formatDate(p.date)}</div>
-          <h3>${esc(p.title)}</h3>
-          ${p.summary ? `<p>${esc(p.summary)}</p>` : ""}
+        <a class="card post" href="${p.url}" data-category="${esc(p.category)}" data-search="${searchText(p)}"${latest ? " data-latest" : ""}>
+          <div class="thumb-wrap">${media(p)}${pill(p)}</div>
+          <div class="post-body">
+            <h3>${esc(p.title)}</h3>
+            ${p.summary ? `<p>${esc(p.summary)}</p>` : ""}
+            ${foot(p)}
+          </div>
         </a>`;
 }
 
-// 部落格頁的分類篩選按鈕：只列出有文章的分類，並顯示篇數
-function filterBar(posts) {
+// 部落格頁最上方的精選（最新）文章
+function featured(p) {
+  return `
+      <a class="featured-post" href="${p.url}" data-category="${esc(p.category)}" data-search="${searchText(p)}">
+        <div class="thumb-wrap">${media(p)}</div>
+        <div class="fp-body">
+          <div class="fp-top"><span class="fp-label">最新文章</span>${pill(p)}</div>
+          <h2>${esc(p.title)}</h2>
+          ${p.summary ? `<p>${esc(p.summary)}</p>` : ""}
+          ${foot(p)}
+          <span class="link-arrow">閱讀文章 →</span>
+        </div>
+      </a>`;
+}
+
+// 分類篩選按鈕（只列出有文章的分類＋篇數）與搜尋框
+function toolbar(posts) {
   const counts = {};
   for (const p of posts) counts[p.category] = (counts[p.category] || 0) + 1;
   const cats = Object.keys(counts).sort((a, b) => {
@@ -94,12 +118,28 @@ function filterBar(posts) {
     return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
   });
   const chip = (value, label, n, on) =>
-    `<button type="button" class="chip" data-filter="${esc(value)}" aria-pressed="${on}">${esc(label)}<span>${n}</span></button>`;
+    `<button type="button" class="chip" data-filter="${esc(value)}" aria-pressed="${on}">${value ? `<i style="background:${colorOf(value)}"></i>` : ""}${esc(label)}<span>${n}</span></button>`;
   return `
-      <div class="filters" role="group" aria-label="依分類篩選文章">
-        ${chip("", "全部", posts.length, true)}
-        ${cats.map(c => chip(c, c, counts[c], false)).join("\n        ")}
+      <div class="blog-toolbar">
+        <div class="filters" role="group" aria-label="依分類篩選文章">
+          ${chip("", "全部", posts.length, true)}
+          ${cats.map(c => chip(c, c, counts[c], false)).join("\n          ")}
+        </div>
+        <label class="search">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input type="search" placeholder="搜尋文章" aria-label="搜尋文章">
+        </label>
       </div>`;
+}
+
+function stats(posts) {
+  const cats = new Set(posts.map(p => p.category)).size;
+  return `
+      <dl class="blog-stats">
+        <div><dt>文章</dt><dd>${posts.length}</dd></div>
+        <div><dt>分類</dt><dd>${cats}</dd></div>
+        <div><dt>最近更新</dt><dd>${formatDate(posts[0].date)}</dd></div>
+      </dl>`;
 }
 
 // 取代 <!-- NAME:START --> 與 <!-- NAME:END --> 之間的內容
@@ -219,8 +259,15 @@ for (const p of posts) {
 }
 
 if (posts.length) {
-  inject("blog.html", "POSTS", `${filterBar(posts)}\n      <div class="grid-3 posts-grid">${posts.map(card).join("")}\n      </div>\n      <p class="filter-empty" hidden>這個分類目前沒有文章。</p>`);
-  inject("index.html", "LATEST", `\n      <div class="grid-3">${posts.slice(0, 3).map(card).join("")}\n      </div>`);
+  inject("blog.html", "STATS", stats(posts));
+  inject("blog.html", "POSTS", [
+    toolbar(posts),
+    featured(posts[0]),
+    `\n      <p class="results" aria-live="polite"></p>`,
+    `\n      <div class="grid-3 posts-grid">${posts.map((p, i) => card(p, i === 0)).join("")}\n      </div>`,
+    `\n      <p class="filter-empty" hidden>找不到符合的文章，換個關鍵字或分類試試。</p>`
+  ].join(""));
+  inject("index.html", "LATEST", `\n      <div class="grid-3">${posts.slice(0, 3).map(p => card(p)).join("")}\n      </div>`);
 }
 fs.writeFileSync(path.join(DIST, "sitemap.xml"), sitemap(posts));
 
