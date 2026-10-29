@@ -4,4 +4,4 @@ Disallow: /thanks.html
 Disallow: /subscribed.html
 Disallow: /admin/
 
-Sitemap: https://wondrous-conkies-68042c.netlify.app/sitemap.xml
+Sitemap: https://jocular-tulumba-f558a8.netlify.app/sitemap.xml

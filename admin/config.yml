@@ -11,8 +11,8 @@ backend:
     deleteMedia: "刪除圖片：{{path}}"
 
 locale: zh_Hant
-site_url: https://wondrous-conkies-68042c.netlify.app
-display_url: https://wondrous-conkies-68042c.netlify.app
+site_url: https://jocular-tulumba-f558a8.netlify.app
+display_url: https://jocular-tulumba-f558a8.netlify.app
 logo_url: /assets/logo-180.png
 
 # 上傳的圖片存放位置

@@ -8,7 +8,7 @@ const ROOT = __dirname;
 const DIST = path.join(ROOT, "dist");
 const POSTS_DIR = path.join(ROOT, "content", "posts");
 // Netlify 建置時會提供 URL（正式網址）；本機建置用預設值
-const SITE_URL = (process.env.URL || "https://wondrous-conkies-68042c.netlify.app").replace(/\/$/, "");
+const SITE_URL = (process.env.URL || "https://jocular-tulumba-f558a8.netlify.app").replace(/\/$/, "");
 
 // 不需要發佈的檔案
 const SKIP = new Set(["dist", "node_modules", "content", "build.js", "package.json", "package-lock.json", "netlify.toml", "README.md", ".git", ".gitignore"]);
