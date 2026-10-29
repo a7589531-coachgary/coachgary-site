@@ -114,24 +114,44 @@ function setLink(el, url, soonText) {
 document.querySelectorAll("[data-pay]").forEach(el => setLink(el, SITE.newebpay[el.dataset.pay], "即將推出"));
 document.querySelectorAll("[data-form]").forEach(el => setLink(el, SITE.forms[el.dataset.form], "即將開放"));
 
-// 部落格分類篩選：網址 blog.html?cat=分類 可直接分享
+// 部落格分類篩選＋搜尋：網址 blog.html?cat=分類 可直接分享
 const filters = document.querySelector(".filters");
 if (filters) {
   const chips = [...filters.querySelectorAll(".chip")];
   const cards = [...document.querySelectorAll(".posts-grid .card.post")];
+  const feature = document.querySelector(".featured-post");
+  const search = document.querySelector(".search input");
+  const results = document.querySelector(".results");
   const empty = document.querySelector(".filter-empty");
-  const apply = cat => {
-    if (cat && !chips.some(c => c.dataset.filter === cat)) cat = "";
+  const state = { cat: "", q: "" };
+
+  const apply = () => {
+    const { cat, q } = state;
     chips.forEach(c => c.setAttribute("aria-pressed", c.dataset.filter === cat));
+    // 沒有篩選時，最新文章以大卡片呈現，列表中不重複顯示
+    const showFeature = !cat && !q && feature;
+    if (feature) feature.hidden = !showFeature;
     let shown = 0;
-    cards.forEach(c => { c.hidden = !!cat && c.dataset.category !== cat; if (!c.hidden) shown++; });
+    cards.forEach(c => {
+      const match = (!cat || c.dataset.category === cat) && (!q || c.dataset.search.includes(q));
+      c.hidden = !match || (showFeature && c.hasAttribute("data-latest"));
+      if (match) shown++;
+    });
+    if (results) {
+      results.textContent = q ? `搜尋「${q}」・共 ${shown} 篇` : cat ? `${cat}・共 ${shown} 篇` : "";
+      results.hidden = !results.textContent;
+    }
     if (empty) empty.hidden = shown > 0;
     const url = new URL(location.href);
     cat ? url.searchParams.set("cat", cat) : url.searchParams.delete("cat");
     history.replaceState(null, "", url);
   };
-  chips.forEach(c => c.addEventListener("click", () => apply(c.dataset.filter)));
-  apply(new URLSearchParams(location.search).get("cat") || "");
+
+  chips.forEach(c => c.addEventListener("click", () => { state.cat = c.dataset.filter; apply(); }));
+  if (search) search.addEventListener("input", () => { state.q = search.value.trim().toLowerCase(); apply(); });
+  const initial = new URLSearchParams(location.search).get("cat") || "";
+  state.cat = chips.some(c => c.dataset.filter === initial) ? initial : "";
+  apply();
 }
 
 // 流量統計：填入 GA4 評估 ID 且不在本機時才載入
