@@ -25,11 +25,15 @@ const CATEGORY_COLORS = loadCategoryColors();
 
 const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+// 日期一律以台灣時間顯示為 2026/10/29（建置主機是 UTC，避免跨日誤差）
 function formatDate(d) {
   const date = new Date(d);
   if (isNaN(date)) return "";
-  const p = n => String(n).padStart(2, "0");
-  return `${date.getFullYear()}.${p(date.getMonth() + 1)}.${p(date.getDate())}`;
+  return isoDate(date).replace(/-/g, "/");
+}
+function isoDate(d) {
+  const date = new Date(d);
+  return isNaN(date) ? "" : date.toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" });
 }
 
 function copyDir(src, dst) {
@@ -119,7 +123,7 @@ ${JSON.stringify({
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   headline: p.title,
-  datePublished: p.date ? new Date(p.date).toISOString() : undefined,
+  datePublished: isoDate(p.date) || undefined,
   image: ogImage,
   author: { "@type": "Person", name: "葉博文", jobTitle: "職棒體能教練" },
   publisher: { "@type": "Organization", name: "CoachGary Performance" },
@@ -136,7 +140,7 @@ ${JSON.stringify({
     <div class="wrap narrow">
       <div class="crumbs"><a href="index.html">首頁</a> / <a href="blog.html">部落格</a> / ${esc(p.category)}</div>
       <h1>${esc(p.title)}</h1>
-      <p class="post-meta">${formatDate(p.date)}・${esc(p.category)}・職棒體能教練葉博文</p>
+      <p class="post-meta">${esc(p.category)}</p>
     </div>
   </section>
 
@@ -146,6 +150,8 @@ ${JSON.stringify({
       <div class="prose">
 ${p.html}
       </div>
+
+      <p class="signature">葉博文, Gary, CSCS<br><time datetime="${isoDate(p.date)}">${formatDate(p.date)}</time></p>
 
       <aside class="author">
         <img src="assets/gary.webp" alt="" width="72" height="72">
@@ -179,7 +185,7 @@ function sitemap(posts) {
   const pages = ["", "services.html", "products.html", "product-subscription.html", "product-digital.html", "product-course.html", "product-onsite.html", "about.html", "blog.html", "faq.html", "contact.html"];
   const today = new Date().toISOString().slice(0, 10);
   const urls = pages.map(p => `  <url><loc>${SITE_URL}/${p}</loc><lastmod>${today}</lastmod></url>`)
-    .concat(posts.map(p => `  <url><loc>${SITE_URL}/${p.url}</loc><lastmod>${new Date(p.date).toISOString().slice(0, 10)}</lastmod></url>`));
+    .concat(posts.map(p => `  <url><loc>${SITE_URL}/${p.url}</loc><lastmod>${isoDate(p.date)}</lastmod></url>`));
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`;
 }
 

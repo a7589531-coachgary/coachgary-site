@@ -30,7 +30,7 @@ collections:
     sortable_fields: ["date", "title"]
     fields:
       - { label: 標題, name: title, widget: string }
-      - { label: 發布日期, name: date, widget: datetime, format: "YYYY-MM-DDTHH:mm:ssZ" }
+      - { label: 發布日期, name: date, widget: datetime, date_format: "YYYY/MM/DD", time_format: false, format: "YYYY-MM-DD", picker_utc: true }
       # 分類選項來自「網站設定 → 文章分類」，可在後台自行新增
       - label: 分類（要新增分類，請到左側「網站設定 → 文章分類」）
         name: category
