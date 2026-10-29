@@ -271,6 +271,27 @@ html:not(.dev) .draft, html:not(.dev) .placeholder { display: none !important; }
 .post h3 { font-size: 18px; line-height: 1.45; }
 
 .post p { margin-top: 8px; font-size: 14px; }
+.card.post[hidden] { display: none; }
+
+/* 部落格分類篩選 */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: #fff; color: var(--ink-2);
+  font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: border-color .15s, background .15s;
+}
+.chip span { font-size: 12px; font-weight: 700; color: var(--ink-3); background: var(--bg-soft); border-radius: 999px; padding: 0 7px; }
+.chip:hover { border-color: var(--ink-3); }
+.chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.chip[aria-pressed="true"] span { background: rgba(255,255,255,.18); color: #fff; }
+.filter-empty { text-align: center; color: var(--ink-3); padding: 32px 0; }
+.tag-link { display: inline-block; padding: 2px 12px; border-radius: 999px; background: #fff; border: 1px solid var(--line); text-decoration: none; color: var(--accent-ink); font-weight: 700; }
+.tag-link:hover { border-color: var(--accent-ink); }
+@media (max-width: 560px) {
+  .filters { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 24px; padding: 0 16px 4px; scrollbar-width: none; }
+  .filters::-webkit-scrollbar { display: none; }
+  .chip { flex: none; }
+}
 img.thumb { width: 100%; object-fit: cover; }
 
 /* ---------- Article page ---------- */
