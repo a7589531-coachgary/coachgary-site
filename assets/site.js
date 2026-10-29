@@ -154,6 +154,18 @@ if (filters) {
   apply();
 }
 
+// 文章觀看次數：同一個瀏覽器分頁工作階段只計一次，本機預覽不計
+const slug = document.body.dataset.slug;
+if (slug && !isLocal && !navigator.webdriver) {
+  const key = "viewed:" + slug;
+  try {
+    if (!sessionStorage.getItem(key)) {
+      sessionStorage.setItem(key, "1");
+      fetch("/api/views?slug=" + encodeURIComponent(slug), { method: "POST", keepalive: true }).catch(() => {});
+    }
+  } catch (e) { /* 無法使用 sessionStorage 時略過 */ }
+}
+
 // 流量統計：填入 GA4 評估 ID 且不在本機時才載入
 if (SITE.ga4 && !isLocal) {
   const s = document.createElement("script");
